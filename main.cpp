@@ -34,7 +34,7 @@ bool loadDictionary(const std::string& filename, Trie& trie) {
     return wordCount > 0;
 }
 
-void handleAutocomplete(const Trie& trie) {
+void handleAutocomplete(Trie& trie) {
     std::string prefix;
     std::cout << "\nEnter prefix: ";
     std::cin >> prefix;
@@ -54,12 +54,24 @@ void handleAutocomplete(const Trie& trie) {
             std::cout << "  " << (i + 1) << ". " << suggestions[i] 
                      << " (freq: " << trie.getFrequency(suggestions[i]) << ")" << std::endl;
         }
+        
+        // Allow user to select a suggestion
+        std::cout << "\nSelect a suggestion (1-" << suggestions.size() << ") or 0 to skip: ";
+        int choice;
+        std::cin >> choice;
+        
+        if (choice > 0 && choice <= static_cast<int>(suggestions.size())) {
+            std::string selectedWord = suggestions[choice - 1];
+            trie.incrementFrequency(selectedWord);
+            std::cout << "Selected: " << selectedWord 
+                     << " (new freq: " << trie.getFrequency(selectedWord) << ")" << std::endl;
+        }
     }
     
     std::cout << "Time: " << duration.count() << " μs" << std::endl;
 }
 
-void handleSpellCheck(const Trie& trie) {
+void handleSpellCheck(Trie& trie) {
     std::string word;
     std::cout << "\nEnter word: ";
     std::cin >> word;
@@ -74,6 +86,10 @@ void handleSpellCheck(const Trie& trie) {
         std::cout << "\n✓ Correct spelling!" << std::endl;
         std::cout << "Frequency: " << trie.getFrequency(word) << std::endl;
         std::cout << "Time: " << duration.count() << " μs" << std::endl;
+        
+        // Increment frequency for the word being checked
+        trie.incrementFrequency(word);
+        std::cout << "Word used! New frequency: " << trie.getFrequency(word) << std::endl;
     } else {
         std::vector<std::string> suggestions = trie.getSuggestions(word, 2);
         auto end = std::chrono::high_resolution_clock::now();
@@ -89,9 +105,54 @@ void handleSpellCheck(const Trie& trie) {
             for (int i = 0; i < count; ++i) {
                 std::cout << "  " << (i + 1) << ". " << suggestions[i] << std::endl;
             }
+            
+            // Allow user to select a suggestion
+            std::cout << "\nSelect a suggestion (1-" << count << ") or 0 to add '" 
+                     << word << "' to dictionary: ";
+            int choice;
+            std::cin >> choice;
+            
+            if (choice > 0 && choice <= count) {
+                std::string selectedWord = suggestions[choice - 1];
+                trie.incrementFrequency(selectedWord);
+                std::cout << "Selected: " << selectedWord 
+                         << " (new freq: " << trie.getFrequency(selectedWord) << ")" << std::endl;
+            } else if (choice == 0) {
+                // Add new word to dictionary
+                std::string lowerWord;
+                for (char c : word) {
+                    lowerWord += std::tolower(c);
+                }
+                trie.insert(lowerWord, 1);
+                std::cout << "Added '" << lowerWord << "' to dictionary with frequency 1" << std::endl;
+            }
         }
         
         std::cout << "Time: " << duration.count() << " ms" << std::endl;
+    }
+}
+
+void handleAddWord(Trie& trie) {
+    std::string word;
+    std::cout << "\nEnter new word to add: ";
+    std::cin >> word;
+    
+    if (word.empty()) {
+        std::cout << "Invalid word" << std::endl;
+        return;
+    }
+    
+    std::string lowerWord;
+    for (char c : word) {
+        lowerWord += std::tolower(c);
+    }
+    
+    if (trie.search(lowerWord)) {
+        std::cout << "Word '" << lowerWord << "' already exists with frequency: " 
+                 << trie.getFrequency(lowerWord) << std::endl;
+    } else {
+        trie.insert(lowerWord, 1);
+        std::cout << "Successfully added '" << lowerWord << "' to dictionary!" << std::endl;
     }
 }
 
@@ -99,9 +160,10 @@ int main() {
     std::cout << "=== Autocomplete & Spell Checker ===" << std::endl;
     
     Trie trie;
+    std::string dictionaryFile = "dictionary.txt";
     
     auto startLoad = std::chrono::high_resolution_clock::now();
-    if (!loadDictionary("dictionary.txt", trie)) {
+    if (!loadDictionary(dictionaryFile, trie)) {
         std::cerr << "Failed to load dictionary" << std::endl;
         return 1;
     }
@@ -115,7 +177,8 @@ int main() {
         std::cout << "\n========================================" << std::endl;
         std::cout << "1. Autocomplete" << std::endl;
         std::cout << "2. Spell Checker" << std::endl;
-        std::cout << "3. Exit" << std::endl;
+        std::cout << "3. Add New Word" << std::endl;
+        std::cout << "4. Exit" << std::endl;
         std::cout << "========================================" << std::endl;
         std::cout << "Choice: ";
         
@@ -132,6 +195,15 @@ int main() {
                 handleSpellCheck(trie);
                 break;
             case 3:
+                handleAddWord(trie);
+                break;
+            case 4:
+                std::cout << "\nSaving dictionary..." << std::endl;
+                if (trie.saveDictionary(dictionaryFile)) {
+                    std::cout << "Dictionary saved successfully!" << std::endl;
+                } else {
+                    std::cerr << "Failed to save dictionary!" << std::endl;
+                }
                 std::cout << "Goodbye!" << std::endl;
                 running = false;
                 break;
