@@ -28,6 +28,11 @@ private:
     void getAllWords(std::shared_ptr<TrieNode> node,
                     const std::string& currentWord,
                     std::vector<std::string>& allWords) const;
+    
+    // Helper for collecting all words with frequencies
+    void collectAllWordsWithFrequency(std::shared_ptr<TrieNode> node,
+                                     const std::string& currentWord,
+                                     std::vector<std::pair<std::string, int>>& words) const;
 
 public:
     Trie();
@@ -41,6 +46,11 @@ public:
     std::vector<std::string> getSuggestions(const std::string& word, int maxEditDistance = 2) const;
     
     int getFrequency(const std::string& word) const;
+    
+    // New methods for frequency management and persistence
+    void incrementFrequency(const std::string& word);
+    std::vector<std::pair<std::string, int>> getAllWordsWithFrequency() const;
+    bool saveDictionary(const std::string& filename) const;
 };
 
 #endif // TRIE_H
