@@ -1,6 +1,8 @@
 #include "Trie.h"
 #include <algorithm>
 #include <cctype>
+#include <fstream>
+#include <iostream>
 
 // Forward declaration for edit distance function
 int calculateEditDistance(const std::string& word1, const std::string& word2);
@@ -188,4 +190,70 @@ int Trie::getFrequency(const std::string& word) const {
     }
     
     return current->isEndOfWord ? current->frequency : 0;
+}
+
+void Trie::incrementFrequency(const std::string& word) {
+    if (word.empty()) return;
+    
+    std::shared_ptr<TrieNode> current = root;
+    std::string lowerWord;
+    
+    for (char c : word) {
+        char lowerChar = std::tolower(c);
+        lowerWord += lowerChar;
+        
+        if (current->children.find(lowerChar) == current->children.end()) {
+            return; // Word doesn't exist
+        }
+        current = current->children[lowerChar];
+    }
+    
+    if (current->isEndOfWord) {
+        current->frequency++;
+    }
+}
+
+void Trie::collectAllWordsWithFrequency(std::shared_ptr<TrieNode> node,
+                                       const std::string& currentWord,
+                                       std::vector<std::pair<std::string, int>>& words) const {
+    if (!node) return;
+    
+    if (node->isEndOfWord) {
+        words.push_back({currentWord, node->frequency});
+    }
+    
+    for (const auto& pair : node->children) {
+        collectAllWordsWithFrequency(pair.second, currentWord + pair.first, words);
+    }
+}
+
+std::vector<std::pair<std::string, int>> Trie::getAllWordsWithFrequency() const {
+    std::vector<std::pair<std::string, int>> words;
+    collectAllWordsWithFrequency(root, "", words);
+    
+    // Sort alphabetically for consistent output
+    std::sort(words.begin(), words.end(),
+              [](const auto& a, const auto& b) {
+                  return a.first < b.first;
+              });
+    
+    return words;
+}
+
+bool Trie::saveDictionary(const std::string& filename) const {
+    std::ofstream file(filename);
+    
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file '" << filename << "' for writing" << std::endl;
+        return false;
+    }
+    
+    std::vector<std::pair<std::string, int>> words = getAllWordsWithFrequency();
+    
+    for (const auto& pair : words) {
+        file << pair.first << " " << pair.second << "\n";
+    }
+    
+    file.close();
+    return true;
 }
