@@ -1,128 +1,217 @@
-# TextEngine
+<div align="center">
 
-A high-performance C++ autocomplete and spell-checking system built with a Trie data structure and Levenshtein edit distance algorithm.
+# 🚀 TextEngine
 
-## Features
+### *Lightning-fast autocomplete & spell-checking powered by advanced algorithms*
 
-- **Autocomplete**: Get intelligent word suggestions based on prefix matching with frequency ranking
-- **Spell Checking**: Identify misspelled words and receive correction suggestions using edit distance
-- **Frequency Learning**: The system adapts to your usage patterns by tracking word frequencies
-- **Dictionary Management**: Add new words and persist changes across sessions
-- **Performance Optimized**: Fast lookups with optimized memory usage
+[![C++](https://img.shields.io/badge/C++-14+-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)](https://isocpp.org/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
 
-## How It Works
+[Features](#-features) • [Quick Start](#-quick-start) • [Usage](#-usage) • [Technical Details](#-technical-details)
 
-### Trie Data Structure
-The autocomplete system uses a Trie (prefix tree) for efficient prefix-based word retrieval. Each node stores:
-- Child character mappings
-- End-of-word markers
-- Word frequency counts
+</div>
 
-### Levenshtein Edit Distance
-The spell checker calculates the minimum number of operations (insertions, deletions, substitutions) needed to transform one word into another, helping suggest the closest matching words from the dictionary.
+---
 
-## Building the Project
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎯 Intelligent Autocomplete
+Get smart word suggestions with prefix matching, ranked by usage frequency for a personalized experience.
+
+</td>
+<td width="50%">
+
+### 🔍 Advanced Spell Checking
+Powered by Levenshtein distance algorithm to find and suggest the closest matching words.
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📊 Adaptive Learning
+System learns from your usage patterns, automatically adjusting word frequencies over time.
+
+</td>
+<td width="50%">
+
+### 💾 Persistent Storage
+Add custom words and save your personalized dictionary across sessions.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- C++14 or higher
-- A C++ compiler (g++, clang++, or MSVC)
-
-### Compilation
 ```bash
-g++ -std=c++14 -O2 main.cpp trie.cpp editdistance.cpp -o textengine
+C++14 or higher
+g++, clang++, or MSVC compiler
 ```
 
-## Usage
-
-### Running the Program
+### Build & Run
 ```bash
+# Clone the repository
+git clone https://github.com/codev-aryan/TextEngine.git
+cd TextEngine
+
+# Compile
+g++ -std=c++14 -O2 main.cpp trie.cpp editdistance.cpp -o textengine
+
+# Run
 ./textengine
 ```
 
-### Dictionary Format
-The program expects a `dictionary.txt` file in the same directory with the format:
-```
-word frequency
-example 950
-autocomplete 750
-algorithm 980
-```
+---
 
-### Interactive Menu
+## 💡 Usage
 
-1. **Autocomplete**: Enter a prefix to get the top 5 word suggestions ranked by frequency
-2. **Spell Checker**: Enter a word to verify spelling or receive correction suggestions
-3. **Add New Word**: Add custom words to the dictionary
-4. **Exit**: Save changes and exit the program
+### Interactive Demo
 
-## Example Session
+<details>
+<summary><b>📝 Autocomplete Example</b></summary>
 
 ```
-=== Autocomplete & Spell Checker ===
-Loaded 94 words
-Load time: 2 ms
-
-========================================
-1. Autocomplete
-2. Spell Checker
-3. Add New Word
-4. Exit
-========================================
 Choice: 1
 
 Enter prefix: alg
 
 --- Results ---
 Suggestions for 'alg':
-  1. algorithm (freq: 980)
+  1. algorithm (freq: 980) ⭐
 
 Select a suggestion (1-1) or 0 to skip: 1
 Selected: algorithm (new freq: 981)
-Time: 45 μs
+Time: 45 μs ⚡
 ```
 
-## Technical Details
+</details>
 
-### Time Complexity
-- **Insert**: O(m) where m is the word length
-- **Search**: O(m) where m is the word length
-- **Autocomplete**: O(p + n) where p is prefix length and n is number of matching words
-- **Spell Check**: O(k × m × n) where k is max edit distance, m is word length, n is dictionary size
+<details>
+<summary><b>🔎 Spell Check Example</b></summary>
 
-### Space Complexity
-- **Trie Storage**: O(ALPHABET_SIZE × N × M) where N is number of words and M is average word length
-- **Edit Distance**: O(min(m, n)) using space-optimized two-row approach
+```
+Choice: 2
 
-## Features in Detail
+Enter word: algoritm
 
-### Frequency-Based Ranking
-Words are ranked by usage frequency, which increases each time a word is selected or verified. This creates a personalized autocomplete experience that adapts to your vocabulary.
+✗ Not found
 
-### Edit Distance Threshold
-The spell checker uses a maximum edit distance of 2 by default, finding words that require at most 2 character operations to match the input. This provides a good balance between suggestion quality and performance.
+Did you mean:
+  1. algorithm
+  2. algorithmic
+  3. algorithmically
 
-### Case Insensitivity
-All operations are case-insensitive, converting input to lowercase for consistent matching.
+Select a suggestion (1-3) or 0 to add 'algoritm' to dictionary: 1
+Selected: algorithm (new freq: 982)
+Time: 3 ms
+```
 
-## File Structure
+</details>
+
+### Dictionary Format
+Create a `dictionary.txt` file with words and their frequencies:
+```
+algorithm 980
+autocomplete 750
+python 930
+```
+
+---
+
+## 🏗️ Architecture
+
+### 🌲 Trie Data Structure
+Efficient prefix-based word retrieval using a tree structure where each node represents a character.
+
+```
+        root
+       /  |  \
+      a   b   c
+     /    |    \
+   l     o     a
+  /      |      \
+ g      o       t
+```
+
+### 📏 Levenshtein Edit Distance
+Calculates minimum operations (insert/delete/substitute) to transform one word to another.
+
+**Space Optimized**: Uses only 2 rows instead of full matrix - O(min(m,n)) space complexity!
+
+---
+
+## ⚡ Performance
+
+| Operation | Time Complexity | Space Complexity |
+|-----------|----------------|------------------|
+| **Insert** | O(m) | O(1) |
+| **Search** | O(m) | O(1) |
+| **Autocomplete** | O(p + n) | O(n) |
+| **Spell Check** | O(k × m × n) | O(m) |
+
+*where m = word length, n = matching words, p = prefix length, k = max edit distance*
+
+---
+
+## 📁 Project Structure
 
 ```
 textengine/
-├── Trie.h              # Trie class definition
-├── trie.cpp            # Trie implementation
-├── editdistance.cpp    # Levenshtein distance algorithm
-├── main.cpp            # Main program and UI
-└── dictionary.txt      # Word dictionary with frequencies
+│
+├── 📄 Trie.h              # Trie class definition & interface
+├── 📄 trie.cpp            # Core Trie implementation
+├── 📄 editdistance.cpp    # Levenshtein distance algorithm
+├── 📄 main.cpp            # Interactive CLI application
+└── 📄 dictionary.txt      # Word frequency database
 ```
 
-## Contributing
+---
 
-Contributions are welcome! Feel free to submit issues or pull requests to improve TextEngine.
+## 🎯 Key Highlights
 
-## Repository
+> **🔥 Frequency-Based Ranking** - Words you use more often appear first in suggestions
 
-GitHub: [codev-aryan/TextEngine](https://github.com/codev-aryan/TextEngine)
+> **🎨 Case Insensitive** - Automatic lowercase conversion for consistent matching
 
-## License
+> **⚙️ Customizable** - Adjust edit distance threshold and autocomplete limits
 
-This project is open source and available for educational and commercial use.
+> **💪 Memory Efficient** - Smart pointer usage and optimized algorithms
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📜 License
+
+This project is open source and available under the MIT License.
+
+---
+
+<div align="center">
+
+### Built with ❤️ by [codev-aryan](https://github.com/codev-aryan)
+
+⭐ Star this repo if you find it helpful!
+
+[Report Bug](https://github.com/codev-aryan/TextEngine/issues) • [Request Feature](https://github.com/codev-aryan/TextEngine/issues)
+
+</div>
